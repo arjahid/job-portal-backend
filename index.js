@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 require('dotenv').config();
 
@@ -32,11 +32,27 @@ async function run() {
 
     // job related api
     const jobCollection=client.db("jobPortal").collection("job");
+    const applicationCollection=client.db("jobPortal").collection("application");
     app.get('/jobs',async(req,res)=>{
         const cursor=jobCollection.find({});
         const result=await cursor.toArray();
         res.send(result);
     })
+
+    app.get('/jobs/:id',async(req,res)=>{
+        const id=req.params.id;
+        const query={_id: new ObjectId(id)};
+        const result=await jobCollection.findOne(query);
+        res.send(result);
+    })
+    // application related api
+    app.post('/job-application',async(req,res)=>{
+      const application=req.body;
+      const result=await applicationCollection.insertOne(application);
+      res.send(result);
+
+    })
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
