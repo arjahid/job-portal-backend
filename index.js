@@ -3,14 +3,31 @@ const cors = require('cors');
 const jwt =require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { s } = require('motion/react-client');
 const app = express();
 require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin:['http://localhost:5173'],
+  credentials:true,
+}));
 app.use(express.json());
 app.use(cookieParser());
+const veryfyToken=(req,res,next)=>{
+  const token=req.cookies.token;
+  if(!token){
+    return res.status(401).send('unauthorized access')
+  }
+  jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,decoded)=>{
+    if(err){
+      return res.status(403).send('forbidden access')
+    }
+    req.decoded=decoded;
+    next();
+  })
+}
 
 
 
@@ -46,7 +63,7 @@ async function run() {
         httpOnly:true,
         secure: false,
       })
-      .send({token});
+      .send({success:true,token});
     })
 
     app.get('/jobs',async(req,res)=>{
