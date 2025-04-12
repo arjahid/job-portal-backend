@@ -78,6 +78,11 @@ async function run() {
         const result=await jobCollection.findOne(query);
         res.send(result);
     })
+    // Product coutn 
+    app.get('/job-count',async(req,res)=>{
+      const count=await jobCollection.estimatedDocumentCount()
+      res.send({count});
+    })
     // application related api
     app.post('/job-application',async(req,res)=>{
       const application=req.body;
