@@ -3,14 +3,19 @@ const cors = require('cors');
 const jwt =require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const { s } = require('motion/react-client');
+const { s, hr } = require('motion/react-client');
 const app = express();
 require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin:['http://localhost:5173'],
+  origin:['http://localhost:5173',
+    'https://job-portal-2c7f7.web.app/',
+    'https://job-portal-2c7f7.firebaseapp.com/'
+
+    
+  ],
   credentials:true,
 }));
 app.use(express.json());
@@ -45,10 +50,10 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     // job related api
     const jobCollection=client.db("jobPortal").collection("job");
@@ -66,10 +71,15 @@ async function run() {
       .send({success:true,token});
     })
 
-    app.get('/jobs',async(req,res)=>{
-        const cursor=jobCollection.find({});
-        const result=await cursor.toArray();
-        res.send(result);
+    app.get('/jobs', async (req, res) => {
+      const email = req.query.email;
+      let query = {};
+      if (email) {
+        query = { hr_email: email };
+      }
+      const cursor = jobCollection.find(query); // Use the query object here
+      const result = await cursor.toArray();
+      res.send(result);
     })
 
     app.get('/jobs/:id',async(req,res)=>{
@@ -78,7 +88,12 @@ async function run() {
         const result=await jobCollection.findOne(query);
         res.send(result);
     })
-    // Product coutn 
+    app.post('/jobs',async(req,res)=>{
+        const newjob=req.body;
+        const result=await jobCollection.insertOne(newjob);
+        res.send(result);
+    })
+    //  /⁣ Product coutn ⁡
     app.get('/job-count',async(req,res)=>{
       const count=await jobCollection.estimatedDocumentCount()
       res.send({count});
