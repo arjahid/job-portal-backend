@@ -10,7 +10,7 @@ require('dotenv').config();
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin:['http://localhost:5173',
+  origin:['http://localhost:5175',
     'https://job-portal-2c7f7.web.app/',
     'https://job-portal-2c7f7.firebaseapp.com/'
 
@@ -49,17 +49,17 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    // Connect the client to the server (uncomment these lines)
+    await client.connect();
 
-    // await client.db("admin").command({ ping: 1 });
-    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     // job related api
-    const jobCollection=client.db("jobPortal").collection("job");
-    const applicationCollection=client.db("jobPortal").collection("application");
+    const jobCollection = client.db("jobPortal").collection("job");
+    const applicationCollection = client.db("jobPortal").collection("application");
 
-// ⁡⁣⁣⁢Auth related api⁡
+    // ⁡⁣⁣⁢Auth related api⁡
     app.post('/jwt',async(req,res)=>{
       const user=req.body;
       const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1h'})
