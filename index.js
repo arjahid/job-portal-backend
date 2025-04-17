@@ -3,7 +3,8 @@ const cors = require('cors');
 const jwt =require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const { s, hr } = require('motion/react-client');
+
+
 const app = express();
 require('dotenv').config();
 
