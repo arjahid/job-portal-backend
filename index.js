@@ -3,7 +3,8 @@ const cors = require('cors');
 const jwt =require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const { s, hr } = require('motion/react-client');
+
+
 const app = express();
 require('dotenv').config();
 
@@ -52,8 +53,8 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    // await client.db("admin").command({ ping: 1 });
-    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     // job related api
     const jobCollection=client.db("jobPortal").collection("job");
@@ -74,10 +75,18 @@ async function run() {
     app.get('/jobs', async (req, res) => {
       const email = req.query.email;
       let query = {};
+      const sort = req.query?.sort;
+      let sortQuery = {};
+      
       if (email) {
         query = { hr_email: email };
       }
-      const cursor = jobCollection.find(query); // Use the query object here
+      
+      if (sort === "true") {
+        sortQuery = { "salaryRange.min": -1 }; // Sort by salaryRange.min in descending order
+      }
+      
+      const cursor = jobCollection.find(query).sort(sortQuery); // Use sortQuery here
       const result = await cursor.toArray();
       res.send(result);
     })
