@@ -12,8 +12,9 @@ const port = process.env.PORT || 3000;
 
 app.use(cors({
   origin:['http://localhost:5173',
-    'https://job-portal-2c7f7.web.app/',
-    'https://job-portal-2c7f7.firebaseapp.com/'
+    'http://job-portal-2c7f7.web.app/',
+    'https://job-portal-2c7f7.firebaseapp.com/',
+    'https://job-portal-backend-kb8n.onrender.com/'
 
     
   ],
