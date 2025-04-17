@@ -46,29 +46,31 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     // job related api
     const jobCollection = client.db("jobPortal").collection("job");
     const applicationCollection = client.db("jobPortal").collection("application");
 
     // ⁡⁣⁣⁢Auth related api⁡
-    app.post('/jwt', async (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
-      res
-        .cookie('token', token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production', // Set secure cookies in production
-        })
-        .send({ success: true, token });
-    });
+    // app.post('/jwt', async (req, res) => {
+    //   const user = req.body;
+    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    //   res
+    //     .cookie('token', token, {
+    //       httpOnly: true,
+    //       secure: process.env.NODE_ENV === 'production', // Set secure cookies in production
+    //     })
+    //     .send({ success: true, token });
+    // });
 
     app.get('/jobs', async (req, res) => {
       const email = req.query.email;
       let query = {};
       const sort = req.query?.sort;
+      const search=req.query?.search;
+
       let sortQuery = {};
 
       if (email) {
@@ -77,6 +79,9 @@ async function run() {
 
       if (sort === "true") {
         sortQuery = { "salaryRange.min": -1 }; // Sort by salaryRange.min in descending order
+      }
+      if(search){
+        query.location={ $regex: search, $options: 'i' };
       }
 
       const cursor = jobCollection.find(query).sort(sortQuery); // Use sortQuery here
